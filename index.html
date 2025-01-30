@@ -77,7 +77,7 @@
     <script>
         const teamLinks = {
             1: [
-                "https://qrco.de/bfiSyq?trackSharing=1",
+                "https://example.com/team1/clue1",
                 "https://example.com/team1/clue2",
                 "https://example.com/team1/clue3",
                 "https://example.com/team1/clue4",
@@ -98,12 +98,23 @@
             ]
         };
 
-        let currentTeam = null;
-        let currentClueIndex = 0;
+        let currentTeam = localStorage.getItem("currentTeam") ? parseInt(localStorage.getItem("currentTeam")) : null;
+        let currentClueIndex = localStorage.getItem("currentClueIndex") ? parseInt(localStorage.getItem("currentClueIndex")) : 0;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (currentTeam !== null) {
+                document.getElementById('team-selection').style.display = 'none';
+                document.getElementById('clue-section').style.display = 'block';
+                updateClueText();
+            }
+        });
 
         function selectTeam(team) {
             currentTeam = team;
             currentClueIndex = 0;
+            localStorage.setItem("currentTeam", currentTeam);
+            localStorage.setItem("currentClueIndex", currentClueIndex);
+
             document.getElementById('team-selection').style.display = 'none';
             document.getElementById('clue-section').style.display = 'block';
             updateClueText();
@@ -120,11 +131,14 @@
                 message.className = 'message success';
                 message.textContent = 'Correct! Proceeding to the next clue.';
                 currentClueIndex++;
+                localStorage.setItem("currentClueIndex", currentClueIndex);
 
                 if (currentClueIndex < teamLinks[currentTeam].length) {
                     updateClueText();
                 } else {
                     document.getElementById('clue-section').innerHTML = '<p>Congratulations! You have completed the treasure hunt!</p>';
+                    localStorage.removeItem("currentTeam");
+                    localStorage.removeItem("currentClueIndex");
                 }
             } else {
                 message.className = 'message error';
